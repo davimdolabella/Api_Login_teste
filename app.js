@@ -1,5 +1,6 @@
 const express = require("express")
 require('dotenv').config()
+const cors = require('cors')
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -7,6 +8,7 @@ const jwt = require('jsonwebtoken')
 const app = express()
 // config json
 app.use(express.json())
+app.use(cors())
 
 //Models
 const User = require('./models/User')
@@ -26,8 +28,8 @@ app.get('/user/:id',checkToken, async(req, res)=>{
 })
 
 function checkToken(req, res, next){
-    const userHeader = req.headers['authorization']
-    const token = userHeader && userHeader.split(" ")[1]
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(" ")[1]
 
     if(!token){
         return res.status(401).json({msg: 'Acesso negado'})
@@ -124,7 +126,7 @@ app.post('/auth/login', async(req, res) =>{
     secret, 
     )
 
-    res.status(200).json({msg: 'autenticação realizada com sucesso', token})
+    res.status(200).json({msg: 'autenticação realizada com sucesso', token, id: user._id})
     } catch(error){
         console.log(error);
         
